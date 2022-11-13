@@ -1,0 +1,336 @@
+deployment-frontend.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: udagram-frontend
+        image: faysale13/udagram-frontend:v9
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "200m"
+          limits:
+            memory: "1536Mi"
+            cpu: "1000m"
+      restartPolicy: Always
+
+aws-secret.yaml
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aws-secret
+type: Opaque
+data:
+  credentials: ""
+
+
+deployment-backend-feed.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-feed
+  labels:
+    app: backend-feed
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend-feed
+  template:
+    metadata:
+      labels:
+        app: backend-feed
+    spec:
+      containers:
+      - name: udagram-api-feed
+        image: faysale13/udagram-api-feed:v1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: udagram-config
+        - secretRef:
+            name: env-secret
+        volumeMounts:
+        - name: aws-secret
+          mountPath: "/root/.aws/"
+          readOnly: true
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "200m"
+          limits:
+            memory: "1536Mi"
+            cpu: "1000m"
+      restartPolicy: Always
+      volumes:
+      - name: aws-secret
+        secret:
+          secretName: aws-secret
+
+
+deployment-backend-user.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-user
+  labels:
+    app: backend-user
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend-user
+  template:
+    metadata:
+      labels:
+        app: backend-user
+    spec:
+      containers:
+      - name: udagram-api-user
+        image: faysale13/udagram-api-user:v1
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef: 
+            name: udagram-config
+        - secretRef:
+            name: env-secret
+        volumeMounts:
+        - name: aws-secret
+          mountPath: "/root/.aws/"
+          readOnly: true
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "200m"
+          limits:
+            memory: "1536Mi"
+            cpu: "1000m"
+      restartPolicy: Always
+      volumes:
+      - name: aws-secret
+        secret:
+          secretName: aws-secret
+
+
+deployment-reverseproxy.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reverseproxy
+  labels:
+    app: reverseproxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reverseproxy
+  template:
+    metadata:
+      labels:
+        app: reverseproxy
+    spec:
+      containers:
+      - name: udagram-reverseproxy
+        image: faysale13/udagram-reverseproxy:v1
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "200m"
+          limits:
+            memory: "1024Mi"
+            cpu: "1000m"
+      restartPolicy: Always
+
+
+env-configmap.yaml
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: udagram-config
+data:
+  POSTGRES_HOST: "rdsPublicUrl"
+  POSTGRES_DB: "postgres"
+  AWS_BUCKET: "udagram-service-s3"
+  AWS_REGION: "us-east-1"
+  AWS_PROFILE: "default"
+  URL: "PublicFrontendUrl"
+
+
+env-secret.yaml
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: env-secret
+type: Opaque
+stringData:
+  POSTGRES_USERNAME: "username"
+  POSTGRES_PASSWORD: "password"
+  JWT_SECRET: "testing"
+
+
+service-backend-feed.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: backend-feed
+  name: backend-feed
+spec:
+  ports:
+  - name: "8080"
+    port: 8080
+    targetPort: 8080
+  selector:
+    app: backend-feed
+
+
+service-backend-user.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: backend-user
+  name: backend-user
+spec:
+  ports:
+  - name: "8080"
+    port: 8080
+    targetPort: 8080
+  selector:
+    app: backend-user
+
+
+service-frontend.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: frontend
+  name: frontend
+spec:
+  ports:
+  - name: "8080"
+    port: 80
+    targetPort: 80
+  selector:
+    app: frontend
+
+
+service-reverseproxy.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: reverseproxy
+  name: reverseproxy
+spec:
+  ports:
+  - name: "80"
+    port: 8080
+    targetPort: 8080
+  selector:
+    app: reverseproxy
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
