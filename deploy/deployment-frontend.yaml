@@ -16,14 +16,16 @@ spec:
     spec:
       containers:
       - name: udagram-frontend
-        image: abzed/udagram-frontend:v1
+        image: abzed/udagram-frontend
         ports:
         - containerPort: 80
+        command:
+        - --kubelet-insecure-tls
         resources:
           requests:
-            memory: "512Mi"
-            cpu: "200m"
+            memory: 512Mi
+            cpu: 200m
           limits:
-            memory: "1536Mi"
-            cpu: "1000m"
+            memory: 1536Mi
+            cpu: 200m
       restartPolicy: Always
