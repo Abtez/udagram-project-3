@@ -2,30 +2,24 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
-  labels:
-    app: frontend
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: frontend
+      run: frontend
   template:
     metadata:
       labels:
-        app: frontend
+        run: frontend
     spec:
       containers:
-      - name: udagram-frontend
-        image: abzed/udagram-frontend
+      - name: frontend
+        image: docker.io/abzed/udagram-frontend:v2
         ports:
         - containerPort: 80
-        command:
-        - --kubelet-insecure-tls
         resources:
           requests:
-            memory: 512Mi
             cpu: 200m
           limits:
             memory: 1536Mi
             cpu: 200m
-      restartPolicy: Always

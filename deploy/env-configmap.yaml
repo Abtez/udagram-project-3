@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: udagram-config
 data:
-  POSTGRES_HOST: "udagram3-db.cpe3fukqxmpw.us-east-1.rds.amazonaws.com"
+  POSTGRES_HOST: "database-1.cnjg0cp8ffsx.us-east-1.rds.amazonaws.com"
   POSTGRES_DB: "postgres"
   AWS_BUCKET: "udagram3-bucket"
   AWS_REGION: "us-east-1"
